@@ -8,8 +8,7 @@ const { User } = require('../../models');
 const v = new Validator();
 
 const schemaLogin = {
-  email: 'email|empty:false',
-  password: 'string|min:6'
+  email: 'email|empty:false'
 }
 
 const schemaRegister = {
@@ -18,43 +17,45 @@ const schemaRegister = {
   password: 'string|min:6'
 }
 
-router.get('/', Auth.authLogin, async(req, res) => {
-  res.render('pages/auth/login',{
-    layout: 'layouts/test'
+router.get('/', Auth.authLogin, async (req, res) => {
+  const session_store = req.session;
+  return res.render('pages/auth/login', {
+    layout: 'layouts/auth',
+    user: session_store,
+    validates: req.flash('validates'),
+    message: req.flash('message'),
   });
 });
 
-router.get('/register', Auth.authLogin, async(req, res) => {
-  res.render('pages/auth/register',{
-    layout: 'layouts/test'
+router.get('/register', Auth.authLogin, async (req, res) => {
+  const session_store = req.session;
+  return res.render('pages/auth/register', {
+    layout: 'layouts/auth',
+    user: session_store,
+    validates: req.flash('validates'),
+    message: req.flash('message'),
   });
 });
 
 router.post('/login', async (req, res) => {
   const session_store = req.session;
   const validate = v.validate(req.body, schemaLogin);
-  if(validate.length){
-    return res.status(400).json({
-      status: 'error',
-      message: validate
-    });
+  if (validate.length) {
+    req.flash('validates', validate);
+    return res.redirect('/auth');
   }
   const user = await User.findOne({
     where: {
       email: req.body.email
     }
   });
-  if(!user){
-    return res.status(404).json({
-      status: 'error',
-      message: 'user not found'
-    });
+  if (!user) {
+    req.flash('message', 'User not found!');
+    return res.redirect('/auth');
   }
-  if(req.body.password != user.password){
-    return res.status(404).json({
-      status: 'error',
-      message: 'wrong password'
-    });
+  if (req.body.password != user.password) {
+    req.flash('message', 'Wrong password!');
+    return res.redirect('/auth');
   }
   session_store.no_id = user.id;
   session_store.fullName = user.fullName;
@@ -62,18 +63,16 @@ router.post('/login', async (req, res) => {
   session_store.role = user.role;
   session_store.status = user.status;
   session_store.logged = true;
-  req.flash('auth', 'Login success!');
+  req.flash('message', 'Login success!');
   return res.redirect('/');
 });
 
 router.post('/register', async (req, res) => {
   const session_store = req.session;
   const validate = v.validate(req.body, schemaRegister);
-  if(validate.length){
-    return res.status(400).json({
-      status: 'error',
-      message: validate
-    });
+  if (validate.length) {
+    req.flash('validates', validate);
+    return res.redirect('/auth/register');
   }
   const user = await User.findOne({
     where: {
@@ -81,10 +80,8 @@ router.post('/register', async (req, res) => {
     }
   });
   if (user) {
-    return res.status(409).json({
-      status: 'error',
-      message: 'email already exist'
-    });
+    req.flash('message', 'Email already exist!');
+    return res.redirect('/auth/register');
   }
   let data = {
     fullName: req.body.fullName,
@@ -100,17 +97,16 @@ router.post('/register', async (req, res) => {
   session_store.role = createdUser.role;
   session_store.status = createdUser.status;
   session_store.logged = true;
-  req.flash('auth', 'Register success!');
+  req.flash('message', 'Register success!');
   return res.redirect('/');
 });
 
-router.get('/logout', async(req, res) => {
+router.get('/logout', async (req, res) => {
   req.session.destroy((err) => {
-    if(err){
-      alert('Gagal logout');
-    }else{
-      res.redirect('/');
+    if (!err) {
+      return res.redirect('/');
     }
+    return res.redirect('back');
   });
 });
 

@@ -6,8 +6,8 @@ router.get('/', function(req, res, next) {
   const session_store = req.session;
   res.render('index', {
     layout: 'layouts/test',
-    title: session_store,
-    message: req.flash('auth')
+    user: session_store,
+    message: req.flash('message')
   });
 });
 

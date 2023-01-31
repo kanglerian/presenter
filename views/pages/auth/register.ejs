@@ -1,4 +1,15 @@
 <div>
+  <div>
+    <h3><a href="/">Presenter</a></h3>
+  </div>
+  <% if(validates.length > 0) { %>
+    <% validates.forEach(validate => { %>
+      <div></span><span><%= validate.message %></span></div>
+    <% }); %>
+  <% } %>
+  <div>
+    <span><%= message %></span>
+  </div>
   <form action="/auth/register" method="POST">
     <div>
       <label>Fullname:</label>
