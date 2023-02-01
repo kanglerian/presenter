@@ -24,7 +24,8 @@ router.get('/', async (req, res) => {
     user: session_store,
     schools: data,
     validates: req.flash('validates'),
-    message: req.flash('message')
+    message: req.flash('message'),
+    url: req.originalUrl,
   });
 });
 
