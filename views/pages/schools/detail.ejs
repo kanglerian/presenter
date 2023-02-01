@@ -1,0 +1,24 @@
+<% if(message.length > null) { %>
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <span><i class="fas fa-check-circle mr-2"></i> <%= message %></span>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<% } %>
+
+<% if(validates.length > 0) { %>
+<% validates.forEach(validate=> { %>
+<div class="text-center bg-danger text-white rounded my-3 py-2">
+  <span><%= validate.message %></span>
+</div>
+<% }); %>
+<% } %>
+
+<div>
+  <div class="card">
+    <div class="card-header">
+      <%= school.name %>
+    </div>
+  </div>
+</div>

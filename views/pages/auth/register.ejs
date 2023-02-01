@@ -1,31 +1,37 @@
-<div>
-  <div>
-    <h3><a href="/">Presenter</a></h3>
+<div class="p-5">
+  <div class="text-center mb-4">
+    <a href="/"><img src="../../../images/logo-apps.svg" alt="Logo LP3I" width="250px"></a>
   </div>
   <% if(validates.length > 0) { %>
-    <% validates.forEach(validate => { %>
-      <div></span><span><%= validate.message %></span></div>
-    <% }); %>
-  <% } %>
-  <div>
-    <span><%= message %></span>
+  <% validates.forEach(validate=> { %>
+  <div class="text-center bg-danger text-white rounded my-3 py-2">
+    <span><%= validate.message %></span>
   </div>
-  <form action="/auth/register" method="POST">
-    <div>
-      <label>Fullname:</label>
-      <input type="text" name="fullName" placeholder="Type your fullname in here...">
+  <% }); %>
+  <% } %>
+  <% if(message.length > null) { %>
+  <div class="text-center bg-danger text-white rounded my-3 py-2">
+    <span class="small">
+      <%= message %>
+    </span>
+  </div>
+  <% } %>
+  <form class="user" action="/auth/register" method="POST">
+    <div class="form-group">
+      <input type="text" name="fullName" class="form-control form-control-user" placeholder="Type your fullname in here...">
     </div>
-    <div>
-      <label>Email:</label>
-      <input type="email" name="email" placeholder="Type your email in here...">
+    <div class="form-group">
+      <input type="email" name="email" class="form-control form-control-user" placeholder="Type your email in here...">
     </div>
-    <div>
-      <label>Password:</label>
-      <input type="password" name="password" placeholder="Type your password in here...">
+    <div class="form-group">
+      <input type="password" name="password" class="form-control form-control-user" placeholder="Type your password in here...">
     </div>
-    <div>
-      <button type="submit">Register</button>
-      <a href="/auth/">already have an account?</a>
-    </div>
+    <button type="submit" class="btn btn-primary btn-user btn-block">
+      Register
+    </button>
   </form>
+  <hr>
+  <div class="text-center">
+    <a class="small text-primary" href="/auth">Already have an account?</a>
+  </div>
 </div>

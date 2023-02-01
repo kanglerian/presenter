@@ -1,86 +1,108 @@
-let express = require('express');
-let router = express.Router();
+const express = require('express');
+const Validator = require('fastest-validator');
+const router = express.Router();
+
+const { phoneNumberFormatter } = require('../helpers/formatter');
 
 const { School } = require('../models');
 
+const v = new Validator();
+
+const schemaAdd = {
+  name: 'string|empty:false',
+  teacher: 'string|empty:false',
+  address: 'string|empty:false',
+  contact: 'string|optional',
+  status: 'boolean'
+}
+
 router.get('/', async (req, res) => {
-  try {
-    const data = await School.findAll();
-    return res.json({
-      message: 'data successfully loaded.',
-      data: data
-    });
-  } catch (error) {
-    return res.json({
-      status: error
-    });
-  }
+  const session_store = req.session;
+  const data = await School.findAll();
+  return res.render('pages/schools/index', {
+    layout: 'layouts/dashboard',
+    user: session_store,
+    schools: data,
+    validates: req.flash('validates'),
+    message: req.flash('message')
+  });
 });
 
-router.get('/:id', async (req, res) => {
-  try {
-    const data = await School.findOne({
-      where: {
-        id: req.params.id
-      }
-    });
-    return res.json({
-      message: 'data successfully loaded.',
-      presenter: data
-    });
-  } catch (error) {
-    return res.json({
-      status: error
-    });
-  }
+router.get('/detail/:id', async (req, res) => {
+  const session_store = req.session;
+  const data = await School.findOne({
+    where: {
+      id: req.params.id
+    }
+  });
+  return res.render('pages/schools/detail', {
+    layout: 'layouts/dashboard',
+    user: session_store,
+    school: data,
+    validates: req.flash('validates'),
+    message: req.flash('message')
+  });
 });
 
 router.post('/', async (req, res) => {
-  try {
-    await School.create(req.body);
-    res.json({
-      message: 'data has been added.'
-    });
-  } catch (error) {
-    return res.json({
-      status: error
-    });
+  const validate = v.validate({
+    name: req.body.name,
+    teacher: req.body.teacher,
+    contact: req.body.contact,
+    address: req.body.address,
+    status: Boolean(req.body.status)
+  }, schemaAdd);
+  if (validate.length) {
+    req.flash('validates', validate);
+    return res.redirect('/schools');
   }
+  await School.create({
+    name: req.body.name,
+    teacher: req.body.teacher,
+    contact: phoneNumberFormatter(req.body.contact),
+    address: req.body.address,
+    status: req.body.status
+  });
+  req.flash('message', 'Data telah ditambahkan!');
+  return res.redirect('back');
 });
 
-
 router.patch('/:id', async (req, res) => {
-  try {
-    await School.update(req.body,{
-      where: {
-        id: req.params.id
-      }
-    });
-    return res.json({
-      message: 'data has been updated.'
-    });
-  } catch (error) {
-    return res.json({
-      status: error
-    });
+  const validate = v.validate({
+    name: req.body.name,
+    teacher: req.body.teacher,
+    contact: req.body.contact,
+    address: req.body.address,
+    status: Boolean(req.body.status)
+  }, schemaAdd);
+  if (validate.length) {
+    req.flash('validates', validate);
+    return res.redirect('/schools');
   }
+  await School.update({
+    name: req.body.name,
+    teacher: req.body.teacher,
+    contact: phoneNumberFormatter(req.body.contact),
+    address: req.body.address,
+    status: req.body.status
+  }, {
+    where: {
+      id: req.params.id
+    }
+  });
+  req.flash('message', 'Data telah terupdate!');
+  return res.redirect('back');
 });
 
 router.delete('/', async (req, res) => {
-  try {
-    await School.destroy({
-      where: {
-        id: req.body.id
-      }
-    });
-    return res.json({
-      message: 'data has been deleted.'
-    });
-  } catch (error) {
-    return res.json({
-      status: error
-    });
-  }
+  await School.destroy({
+    where: {
+      id: req.body.id
+    }
+  });
+  req.flash('message', 'Data telah dihapus!');
+  return res.redirect('back');
+
 });
 
 module.exports = router;

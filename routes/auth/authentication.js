@@ -104,7 +104,7 @@ router.post('/register', async (req, res) => {
 router.get('/logout', async (req, res) => {
   req.session.destroy((err) => {
     if (!err) {
-      return res.redirect('/');
+      return res.redirect('/auth');
     }
     return res.redirect('back');
   });
