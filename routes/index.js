@@ -6,12 +6,14 @@ const Auth = require('../middlewares/auth');
 const { School } = require('../models');
 
 /* GET home page. */
-router.get('/', Auth.checkLogin, (req, res) => {
+router.get('/', async (req, res) => {
   const session_store = req.session;
-  res.render('pages/schools/index', {
+  const data = await School.findAll();
+  return res.render('index', {
     layout: 'layouts/dashboard',
+    schools: data,
     user: session_store,
-    message: req.flash('message')
+    url: req.originalUrl,
   });
 });
 

@@ -18,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
     teacher: DataTypes.STRING,
     address: DataTypes.TEXT,
     contact: DataTypes.STRING,
-    status: DataTypes.BOOLEAN
+    status: DataTypes.BOOLEAN,
+    createdAt: DataTypes.DATEONLY
   }, {
     sequelize,
     modelName: 'School',

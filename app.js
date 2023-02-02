@@ -42,6 +42,7 @@ app.use(session({ secret: 'secret' }))
 app.use(methodOverride('_method'));
 
 app.use('/', indexRouter);
+
 // Authentication
 app.use('/auth', authRouter);
 

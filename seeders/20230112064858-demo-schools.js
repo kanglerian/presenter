@@ -10,16 +10,16 @@ module.exports = {
         address: 'Jl. Konoha RT.05 RW.16 Tasikmalaya',
         contact: '6281285444333',
         status: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: '2022-12-1',
+        updatedAt: '2022-12-1'
       },{
         name: 'SMKN 3 Tasikmalaya',
         teacher: 'Mang Entis',
         address: 'Jl. Gunung Elang RT.05 RW.16 Bandung',
         contact: '6285212444333',
         status: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: '2022-12-3',
+        updatedAt: '2022-12-1'
       },
     ], {});
 

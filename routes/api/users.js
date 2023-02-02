@@ -1,18 +1,8 @@
-const fs = require('fs');
-const moment = require('moment');
-const express = require('express');
-const PDFDocument = require('pdfkit-table');
-const Validator = require('fastest-validator');
-const readXlsxFile = require('read-excel-file/node')
-const { Op } = require("sequelize");
-const router = express.Router();
+let express = require('express');
+let Validator = require('fastest-validator');
+let router = express.Router();
 
-const Auth = require('../middlewares/auth');
-const upload = require('../middlewares/uploadExcel');
-
-const { User, School } = require('../models');
-
-moment.locale('id');
+const { User } = require('../../models');
 
 const v = new Validator();
 
@@ -30,22 +20,12 @@ const schemaUpdate = {
 }
 
 router.get('/', async (req, res) => {
-  const session_store = req.session;
-  const schools = await School.findAll();
-  const presenters = await User.findAll();
-  const active = await User.findAll({ where: { status: true } });
-  const nonActive = await User.findAll({ where: { status: false } });
-  return res.render('pages/users/index', {
-    layout: 'layouts/dashboard',
-    user: session_store,
-    presenters: presenters,
-    schools: schools,
-    validates: req.flash('validates'),
-    message: req.flash('message'),
-    url: req.baseUrl,
-    active: active,
-    nonActive: nonActive,
-    moment: moment
+  const data = await User.findAll({
+    attributes: ['id','fullName','role','email','status']
+  });
+  return res.json({
+    status: 'success',
+    data: data
   });
 });
 
@@ -54,7 +34,7 @@ router.get('/:id', async (req, res) => {
     where: {
       id: req.params.id
     },
-    attributes: ['id', 'fullName', 'role', 'email', 'status']
+    attributes: ['id','fullName','role','email','status']
   });
   if (!user) {
     return res.status(404).json({
@@ -70,7 +50,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const validate = v.validate(req.body, schema);
-  if (validate.length) {
+  if(validate.length){
     return res.status(400).json({
       status: 'error',
       message: validate
@@ -97,7 +77,7 @@ router.post('/', async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
   const validate = v.validate(req.body, schemaUpdate);
-  if (validate.length) {
+  if(validate.length){
     return res.status(400).json({
       status: 'error',
       message: validate
@@ -108,20 +88,20 @@ router.patch('/:id', async (req, res) => {
       id: req.params.id
     }
   });
-  if (!user) {
+  if(!user){
     return res.status(404).json({
       status: 'error',
       message: 'user not found'
     });
   }
   const email = req.body.email;
-  if (email) {
+  if(email){
     const checkEmail = await User.findOne({
       where: {
         email: email
       }
     });
-    if (checkEmail && email !== user.email) {
+    if(checkEmail && email !== user.email){
       return res.status(409).json({
         status: 'error',
         message: 'email already exist'
